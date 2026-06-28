@@ -47,6 +47,8 @@ There are two client factories — use the right one based on context:
 
 ### Auth flow
 
+Every signed-in-only page must verify the user's session with the Supabase Auth server before it loads, and redirect to the sign-in page if the user is not signed in. Do not rely on the browser-side session alone.
+
 - `/auth/login`, `/auth/sign-up`, `/auth/forgot-password`, `/auth/update-password` — auth pages backed by form components in `components/`
 - `/auth/confirm` — Route Handler that verifies OTP tokens from email links (`verifyOtp`)
 - `/auth/error` — error display page
