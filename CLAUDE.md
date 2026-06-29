@@ -47,13 +47,20 @@ There are two client factories — use the right one based on context:
 
 ### Auth flow
 
-Every signed-in-only page must verify the user's session with the Supabase Auth server before it loads, and redirect to the sign-in page if the user is not signed in. Do not rely on the browser-side session alone.
-
 - `/auth/login`, `/auth/sign-up`, `/auth/forgot-password`, `/auth/update-password` — auth pages backed by form components in `components/`
 - `/auth/confirm` — Route Handler that verifies OTP tokens from email links (`verifyOtp`)
 - `/auth/error` — error display page
 - `/auth/sign-up-success` — post-signup confirmation page
 - `/protected` — example authenticated route; uses `getClaims()` server-side and redirects if unauthenticated
+
+### Authentication rules:
+- Users can only access their own data. Enforce this with Row Level Security (RLS) policies on the database level — never rely solely on application-level checks
+- Use Supabase Auth for all sign-in and session handling — never build custom auth or store passwords yourself
+- Every signed-in-only page must call `supabase.auth.getUser()` on the server before rendering, which re-validates the session with the Supabase Auth server. Never use `supabase.auth.getSession()` for authorization decisions — it only reads the local/cookie data without verifying it against the server, so it can be spoofed
+- Do not rely on Next.js middleware alone for protecting pages — always re-check the session in the Server Component / layout / route handler itself, since middleware can be bypassed in some routing scenarios
+- Every page under /workspace requires a signed-in user; if `getUser()` returns no user, redirect to /login
+- After a successful sign-in, redirect to /workspace
+- After sign-out, redirect to /login
 
 ### Database
 
